@@ -78,10 +78,12 @@ async function start() {
                 }
             }
             await browser.close();
+            console.log("browser closed");
         }
     } catch (e) {
         console.error(e);
         await browser.close();
+        console.log("browser closed");
     }
 }
 
