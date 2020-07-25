@@ -137,6 +137,11 @@ function sleep(t) {
 
 function saveCookies(cookies) {
     fs.writeFileSync("./cookies.json", JSON.stringify(cookies))
+    let simpleCookies = {};
+    for (let c of cookies) {
+        simpleCookies[c.name] = c.value;
+    }
+    fs.writeFileSync("./cookies_simple.json", JSON.stringify(simpleCookies));
 }
 
 function saveUserAgent(ua) {
