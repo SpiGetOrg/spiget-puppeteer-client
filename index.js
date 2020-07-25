@@ -124,11 +124,14 @@ async function tryGet(page, ua, url) {
            return true;
        }catch (e) {
            console.warn(e);
-           console.log("Resetting cookies");
-           saveCookies([]);
-           saveUserAgent("")
+           if(initWasSuccess && status<500) {
+               console.log("Resetting cookies");
+               saveCookies([]);
+               saveUserAgent("")
+           }
            await page.screenshot({path: 'selector_error.png'});
            if(status>400) {
+               console.log("Skipping page");
                fs.writeFileSync("page.html", "" + status);
                toLoad = null;
            }
