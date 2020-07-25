@@ -1,0 +1,8 @@
+node_modules
+
+*.iml
+.idea/*
+
+cookies.json
+*.png
+*.txt
