@@ -53,7 +53,7 @@ async function start() {
                     lastToLoad = toLoad;
                     let curr;
                     try {
-                        curr = tryGet(page, ua, toLoad);
+                        curr = await tryGet(page, ua, toLoad);
                     } catch (e) {
                         console.warn(e);
                     }
@@ -90,6 +90,7 @@ async function start() {
 }
 
 async function tryGet(page, ua, url) {
+    console.log("Loading page...");
     let resp = await page.goto(url);
     // await page.screenshot({path: 'first.png'});
     let cookies = await page.cookies();
