@@ -47,6 +47,7 @@ async function start() {
             await browser.close();
             setTimeout(() => start(), 10000);
         } else {
+            let t = 0;
             while (run) {
                 await sleep(500);
                 if (toLoad) {
@@ -58,8 +59,15 @@ async function start() {
                         console.warn(e);
                     }
                     if (curr) {
+                        t = 0;
                         toLoad = null;
                     } else {
+                        if(t++ > 5){
+                            console.log("Skipping page");
+                            fs.writeFileSync("page.html", "" + status);
+                            toLoad = null;
+                            t = 0;
+                        }
                         await sleep(1000);
                     }
                     await sleep(1000);
@@ -97,7 +105,7 @@ async function tryGet(page, ua, url) {
     console.log("Code: " + resp.status());
     let status = 0;
     let c = 0;
-    while ((status = resp.status()) > 420) {
+    while ((status = resp.status()) > 420 && (c++<5)) {
         await sleep(500);
         console.log("Waiting for navigation...")
         resp = await page.waitForNavigation({timeout: 0, waitUntil: "networkidle0"});
