@@ -5,6 +5,7 @@ const fs = require("fs");
 let run = true;
 let toLoad = "https://spigotmc.org/resources";
 
+let initWasSuccess = false;
 let lastToLoad = "";
 
 (async () => {
@@ -37,6 +38,7 @@ async function start() {
         await page.setUserAgent(ua)
 
         let init = await tryGet(page, ua, "https://spigotmc.org");
+        initWasSuccess = init;
         if (!init) {
             try {
                 await page.close();
@@ -105,25 +107,39 @@ async function tryGet(page, ua, url) {
         await sleep(1000);
     }
     console.log("Last Status: " + status);
-    if (status < 400) {
+    if (status < 400 || (initWasSuccess && status < 500)) { // allow 403s if the first request was a success since it's probably an access thing for premium resources
         console.log("Waiting for xenforo selector...")
         // await page.waitForNavigation();
-        await page.waitForSelector("div#navigation", {timeout: 0})
-        // await page.screenshot({path: 'third.png'});
-        console.log("Got xenforo page!")
+       try{
+           await page.waitForSelector("div#navigation", {timeout: 60})
+           // await page.screenshot({path: 'third.png'});
+           console.log("Got xenforo page!")
 
-        let content = await page.content();
-        fs.writeFileSync("page.html", content);
+           let content = await page.content();
+           fs.writeFileSync("page.html", content);
 
-        cookies = await page.cookies();
-        saveCookies(cookies);
-        saveUserAgent(ua)
-
-        return true;
+           cookies = await page.cookies();
+           saveCookies(cookies);
+           saveUserAgent(ua)
+           return true;
+       }catch (e) {
+           console.warn(e);
+           console.log("Resetting cookies");
+           saveCookies([]);
+           saveUserAgent("")
+           await page.screenshot({path: 'selector_error.png'});
+           if(status>400) {
+               fs.writeFileSync("page.html", "" + status);
+               toLoad = null;
+           }
+           return false;
+       }
     } else {
         console.log("Resetting cookies");
         saveCookies([]);
         saveUserAgent("")
+
+        await page.screenshot({path: 'status_error.png'});
 
         return false;
     }
