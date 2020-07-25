@@ -120,7 +120,7 @@ async function tryGet(page, ua, url) {
         console.log("Waiting for xenforo selector...")
         // await page.waitForNavigation();
        try{
-           await page.waitForSelector("div#navigation", {timeout: 60})
+           await page.waitForSelector("div#navigation", {timeout: 60000})
            // await page.screenshot({path: 'third.png'});
            console.log("Got xenforo page!")
 
