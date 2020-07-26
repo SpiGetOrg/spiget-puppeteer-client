@@ -64,7 +64,7 @@ async function start() {
                     } else {
                         if(t++ > 5){
                             console.log("Skipping page");
-                            fs.writeFileSync("page.html", "" + status);
+                            fs.writeFileSync("page.html", "" + 0);
                             toLoad = null;
                             t = 0;
                         }
