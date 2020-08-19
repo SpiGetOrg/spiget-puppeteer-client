@@ -12,6 +12,18 @@ let lastToLoad = "";
     await start();
 })();
 
+function newUserAgent() {
+    let userAgents = JSON.parse(fs.readFileSync("./crawler-user-agents.json"));
+    let a =  Math.floor(Math.random() * userAgents.length);
+    let agent = userAgents[a];
+    console.log(agent);
+    let b = Math.floor(Math.random()*agent.instances.length);
+    let instance = agent.instances[b];
+    console.log(instance);
+    return instance;
+    // return new UserAgent().toString()
+}
+
 async function start() {
     // console.log("Checking toLoad...");
     let exists = fs.existsSync("toload.txt");
@@ -32,12 +44,12 @@ async function start() {
         }
         let ua = fs.readFileSync("./useragent.txt").toString("utf8");
         if (!ua || ua.length < 2) {
-            ua = new UserAgent().toString()
+            ua = newUserAgent();
         }
         console.log("Using User-Agent: " + ua);
         await page.setUserAgent(ua)
 
-        let init = await tryGet(page, ua, "https://spigotmc.org");
+        let init = await tryGet(page, ua, "https://spigotmc.org", true);
         initWasSuccess = init;
         if (!init) {
             try {
@@ -97,7 +109,7 @@ async function start() {
     }
 }
 
-async function tryGet(page, ua, url) {
+async function tryGet(page, ua, url, doNotWrite) {
     console.log("Loading page...");
     let resp = await page.goto(url);
     // await page.screenshot({path: 'first.png'});
@@ -108,7 +120,7 @@ async function tryGet(page, ua, url) {
     while ((status = resp.status()) > 420 && (c++<5)) {
         await sleep(500);
         console.log("Waiting for navigation...")
-        resp = await page.waitForNavigation({timeout: 0, waitUntil: "networkidle0"});
+        resp = await page.waitForNavigation({timeout: 50000, waitUntil: "networkidle0"});
         // await page.screenshot({path: 'second' + (c++) + '.png'});
         console.log("Code: " + (status = resp.status()));
         cookies = await page.cookies();
