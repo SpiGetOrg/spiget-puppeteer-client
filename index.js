@@ -137,7 +137,9 @@ async function tryGet(page, ua, url, doNotWrite) {
            console.log("Got xenforo page!")
 
            let content = await page.content();
-           fs.writeFileSync("page.html", content);
+           if(!doNotWrite) {
+               fs.writeFileSync("page.html", url + "\n" + content, "utf8");
+           }
 
            cookies = await page.cookies();
            saveCookies(cookies);
@@ -153,7 +155,7 @@ async function tryGet(page, ua, url, doNotWrite) {
            await page.screenshot({path: 'selector_error.png'});
            if(status>400) {
                console.log("Skipping page");
-               fs.writeFileSync("page.html", "" + status);
+               fs.writeFileSync("page.html", url + "\n" + status, "utf8");
                toLoad = null;
            }
            return false;
