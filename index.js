@@ -76,7 +76,7 @@ async function start() {
                     } else {
                         if(t++ > 5){
                             console.log("Skipping page");
-                            fs.writeFileSync("page.html", "" + 0);
+                            fs.writeFileSync("page.html", toLoad + "\n" + 0 + "\n", "utf8");
                             toLoad = null;
                             t = 0;
                         }
@@ -155,7 +155,7 @@ async function tryGet(page, ua, url, doNotWrite) {
            await page.screenshot({path: 'selector_error.png'});
            if(status>400) {
                console.log("Skipping page");
-               fs.writeFileSync("page.html", url + "\n" + status, "utf8");
+               fs.writeFileSync("page.html", url + "\n" + status + "\n", "utf8");
                toLoad = null;
            }
            return false;
