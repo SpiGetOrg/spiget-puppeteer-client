@@ -4,9 +4,11 @@ const fs = require("fs");
 
 let run = true;
 let toLoad = "https://spigotmc.org/resources";
+let toLoadTime = 0;
 
 let initWasSuccess = false;
 let lastToLoad = "";
+let lastToLoadTime = 0;
 
 (async () => {
     await start();
@@ -28,6 +30,7 @@ async function start() {
     // console.log("Checking toLoad...");
     let exists = fs.existsSync("toload.txt");
     if (!exists) {
+        fs.writeFileSync("page.html", "" + "\n" + 0 + "\n", "utf8");
         setTimeout(() => start(), 30000);
         return;
     }
@@ -64,6 +67,7 @@ async function start() {
                 await sleep(500);
                 if (toLoad) {
                     lastToLoad = toLoad;
+                    lastToLoadTime = toLoadTime;
                     let curr;
                     try {
                         curr = await tryGet(page, ua, toLoad);
@@ -87,8 +91,10 @@ async function start() {
                 let exists = fs.existsSync("toload.txt");
                 if (exists) {
                     let newToLoad = fs.readFileSync("toload.txt").toString("utf8");
-                    if (newToLoad !== lastToLoad) {
+                    let newFileTime = fs.statSync("toload.txt").mtimeMs;
+                    if (newToLoad !== lastToLoad || Math.abs(newFileTime-lastToLoadTime)>100) {
                         toLoad = newToLoad;
+                        toLoadTime = newFileTime;
                         console.log("New toLoad: " + toLoad);
                     }
                 } else {
@@ -96,6 +102,7 @@ async function start() {
                     run = false;
                     toLoad = "";
                     lastToLoad = "";
+                    lastToLoadTime = 0;
                     setTimeout(() => start(), 30000);
                 }
             }
