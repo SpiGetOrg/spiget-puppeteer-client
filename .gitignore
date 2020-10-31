@@ -3,6 +3,7 @@ node_modules
 *.iml
 .idea/*
 
+config.js
 cookies.json
 *.png
 *.txt
